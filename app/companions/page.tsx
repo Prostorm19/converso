@@ -1,6 +1,6 @@
-import {getAllCompanions} from "@/lib/actions/companion.actions";
+import { getAllCompanions, getBookmarkedCompanionIds } from "@/lib/actions/companion.actions";
 import CompanionCard from "@/components/CompanionCard";
-import {getSubjectColor} from "@/lib/utils";
+import { getSubjectColor } from "@/lib/utils";
 import SearchInput from "@/components/SearchInput";
 import SubjectFilter from "@/components/SubjectFilter";
 
@@ -10,6 +10,7 @@ const CompanionsLibrary = async ({ searchParams }: SearchParams) => {
     const topic = filters.topic ? filters.topic : '';
 
     const companions = await getAllCompanions({ subject, topic });
+    const bookmarkedIds = await getBookmarkedCompanionIds();
 
     return (
         <main>
@@ -26,6 +27,7 @@ const CompanionsLibrary = async ({ searchParams }: SearchParams) => {
                         key={companion.id}
                         {...companion}
                         color={getSubjectColor(companion.subject)}
+                        bookmarked={bookmarkedIds.has(companion.id)}
                     />
                 ))}
             </section>

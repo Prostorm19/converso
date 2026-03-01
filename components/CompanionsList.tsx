@@ -8,17 +8,19 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table"
-import {cn, getSubjectColor} from "@/lib/utils";
+import { cn, getSubjectColor } from "@/lib/utils";
 import Link from "next/link";
 import Image from "next/image";
+import UnbookmarkButton from "@/components/UnbookmarkButton";
 
 interface CompanionsListProps {
     title: string;
     companions?: Companion[];
     classNames?: string;
+    showUnbookmark?: boolean;
 }
 
-const CompanionsList = ({ title, companions, classNames }: CompanionsListProps) => {
+const CompanionsList = ({ title, companions, classNames, showUnbookmark }: CompanionsListProps) => {
     return (
         <article className={cn('companion-list', classNames)}>
             <h2 className="font-bold text-3xl">{title}</h2>
@@ -29,10 +31,11 @@ const CompanionsList = ({ title, companions, classNames }: CompanionsListProps) 
                         <TableHead className="text-lg w-2/3">Lessons</TableHead>
                         <TableHead className="text-lg">Subject</TableHead>
                         <TableHead className="text-lg text-right">Duration</TableHead>
+                        {showUnbookmark && <TableHead className="text-lg text-right"></TableHead>}
                     </TableRow>
                 </TableHeader>
                 <TableBody>
-                    {companions?.map(({id, subject, name, topic, duration}) => (
+                    {companions?.map(({ id, subject, name, topic, duration }) => (
                         <TableRow key={id}>
                             <TableCell>
                                 <Link href={`/companions/${id}`}>
@@ -59,13 +62,13 @@ const CompanionsList = ({ title, companions, classNames }: CompanionsListProps) 
                                 <div className="subject-badge w-fit max-md:hidden">
                                     {subject}
                                 </div>
-                                <div className="flex items-center justify-center rounded-lg w-fit p-2 md:hidden" style={{backgroundColor: getSubjectColor(subject)}}>
-                            <Image
-                                src={`/icons/${subject}.svg`}
-                                alt={subject}
-                                width={18}
-                                height={18}
-                            />
+                                <div className="flex items-center justify-center rounded-lg w-fit p-2 md:hidden" style={{ backgroundColor: getSubjectColor(subject) }}>
+                                    <Image
+                                        src={`/icons/${subject}.svg`}
+                                        alt={subject}
+                                        width={18}
+                                        height={18}
+                                    />
                                 </div>
                             </TableCell>
                             <TableCell>
@@ -77,6 +80,11 @@ const CompanionsList = ({ title, companions, classNames }: CompanionsListProps) 
                                     <Image src="/icons/clock.svg" alt="minutes" width={14} height={14} className="md:hidden" />
                                 </div>
                             </TableCell>
+                            {showUnbookmark && (
+                                <TableCell>
+                                    <UnbookmarkButton companionId={id} />
+                                </TableCell>
+                            )}
                         </TableRow>
                     ))}
                 </TableBody>

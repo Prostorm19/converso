@@ -73,6 +73,7 @@ const Profile = async () => {
             <CompanionsList
               companions={bookmarkedCompanions}
               title="Bookmarked Companions"
+              showUnbookmark
             />
           </AccordionContent>
         </AccordionItem>
