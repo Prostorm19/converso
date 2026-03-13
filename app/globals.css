@@ -258,6 +258,14 @@ body {
   .captions-overlay-message {
     @apply text-base leading-relaxed;
   }
+
+  /* Rename companion */
+  .rename-btn {
+    @apply p-2 rounded-lg cursor-pointer transition-all duration-200 hover:bg-gray-100 border border-transparent hover:border-gray-300;
+  }
+  .rename-input {
+    @apply border-2 border-primary rounded-lg px-3 py-1 text-lg outline-none bg-white text-black w-full max-w-[200px];
+  }
 }
 
 @layer utilities {

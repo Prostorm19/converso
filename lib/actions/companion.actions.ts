@@ -211,3 +211,30 @@ export const getBookmarkedCompanionIds = async (): Promise<Set<string>> => {
     if (error) return new Set();
     return new Set(data.map((b: { companion_id: string }) => b.companion_id));
 };
+
+// Rename companion
+export const renameCompanion = async (companionId: string, newName: string, path: string) => {
+    const { userId } = await auth();
+    if (!userId) throw new Error('Unauthorized');
+    const supabase = createSupabaseClient();
+
+    // Verify the user is the author
+    const { data: companion, error: fetchError } = await supabase
+        .from('companions')
+        .select('author')
+        .eq('id', companionId)
+        .single();
+
+    if (fetchError || !companion) throw new Error('Companion not found');
+    if (companion.author !== userId) throw new Error('You can only rename your own companions');
+
+    const { error } = await supabase
+        .from('companions')
+        .update({ name: newName.trim() })
+        .eq('id', companionId);
+
+    if (error) throw new Error(error.message);
+
+    revalidatePath(path);
+};
+

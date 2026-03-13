@@ -12,15 +12,17 @@ import { cn, getSubjectColor } from "@/lib/utils";
 import Link from "next/link";
 import Image from "next/image";
 import UnbookmarkButton from "@/components/UnbookmarkButton";
+import RenameCompanionButton from "@/components/RenameCompanionButton";
 
 interface CompanionsListProps {
     title: string;
     companions?: Companion[];
     classNames?: string;
     showUnbookmark?: boolean;
+    showRename?: boolean;
 }
 
-const CompanionsList = ({ title, companions, classNames, showUnbookmark }: CompanionsListProps) => {
+const CompanionsList = ({ title, companions, classNames, showUnbookmark, showRename }: CompanionsListProps) => {
     return (
         <article className={cn('companion-list', classNames)}>
             <h2 className="font-bold text-3xl">{title}</h2>
@@ -31,7 +33,7 @@ const CompanionsList = ({ title, companions, classNames, showUnbookmark }: Compa
                         <TableHead className="text-lg w-2/3">Lessons</TableHead>
                         <TableHead className="text-lg">Subject</TableHead>
                         <TableHead className="text-lg text-right">Duration</TableHead>
-                        {showUnbookmark && <TableHead className="text-lg text-right"></TableHead>}
+                        {(showUnbookmark || showRename) && <TableHead className="text-lg text-right"></TableHead>}
                     </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -80,9 +82,16 @@ const CompanionsList = ({ title, companions, classNames, showUnbookmark }: Compa
                                     <Image src="/icons/clock.svg" alt="minutes" width={14} height={14} className="md:hidden" />
                                 </div>
                             </TableCell>
-                            {showUnbookmark && (
+                            {(showUnbookmark || showRename) && (
                                 <TableCell>
-                                    <UnbookmarkButton companionId={id} />
+                                    <div className="flex items-center gap-2 justify-end">
+                                        {showRename && (
+                                            <RenameCompanionButton companionId={id} currentName={name} />
+                                        )}
+                                        {showUnbookmark && (
+                                            <UnbookmarkButton companionId={id} />
+                                        )}
+                                    </div>
                                 </TableCell>
                             )}
                         </TableRow>

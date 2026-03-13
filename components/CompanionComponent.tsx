@@ -223,6 +223,7 @@ const CompanionComponent = ({ companionId, subject, topic, name, userName, userI
                 <input
                     type="text"
                     className="text-input"
+                    style={{ color: '#000' }}
                     placeholder={callStatus === CallStatus.ACTIVE ? "Type a message to your companion..." : "Start a session to send messages..."}
                     value={textMessage}
                     onChange={(e) => setTextMessage(e.target.value)}
