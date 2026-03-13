@@ -20,8 +20,11 @@ const CompanionComponent = ({ companionId, subject, topic, name, userName, userI
     const [isSpeaking, setIsSpeaking] = useState(false);
     const [isMuted, setIsMuted] = useState(false);
     const [messages, setMessages] = useState<SavedMessage[]>([]);
+    const [textMessage, setTextMessage] = useState('');
+    const [isCaptionsOn, setIsCaptionsOn] = useState(false);
 
     const lottieRef = useRef<LottieRefCurrentProps>(null);
+    const captionsEndRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
         if(lottieRef) {
@@ -32,6 +35,13 @@ const CompanionComponent = ({ companionId, subject, topic, name, userName, userI
             }
         }
     }, [isSpeaking, lottieRef])
+
+    // Auto-scroll captions overlay to latest message
+    useEffect(() => {
+        if (isCaptionsOn && captionsEndRef.current) {
+            captionsEndRef.current.scrollIntoView({ behavior: 'smooth' });
+        }
+    }, [messages, isCaptionsOn]);
 
     useEffect(() => {
         const onCallStart = () => setCallStatus(CallStatus.ACTIVE);
@@ -94,6 +104,30 @@ const CompanionComponent = ({ companionId, subject, topic, name, userName, userI
         vapi.stop()
     }
 
+    const handleSendText = (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!textMessage.trim() || callStatus !== CallStatus.ACTIVE) return;
+
+        // Send text message to Vapi as a user message
+        vapi.send({
+            type: 'add-message',
+            message: {
+                role: 'user',
+                content: textMessage.trim(),
+            },
+        });
+
+        // Add to local transcript
+        const newMessage: SavedMessage = { role: 'user', content: textMessage.trim() };
+        setMessages((prev) => [newMessage, ...prev]);
+
+        setTextMessage('');
+    }
+
+    const toggleCaptions = () => {
+        setIsCaptionsOn((prev) => !prev);
+    }
+
     return (
         <section className="flex flex-col h-[70vh]">
             <section className="flex gap-8 max-sm:flex-col">
@@ -118,6 +152,33 @@ const CompanionComponent = ({ companionId, subject, topic, name, userName, userI
                         </div>
                     </div>
                     <p className="font-bold text-2xl">{name}</p>
+
+                    {/* Live Captions Overlay */}
+                    {isCaptionsOn && callStatus === CallStatus.ACTIVE && (
+                        <div className="captions-overlay">
+                            <div className="captions-overlay-header">
+                                <Image src="/icons/captions.svg" alt="captions" width={16} height={16} className="invert" />
+                                <span>Live Captions</span>
+                            </div>
+                            <div className="captions-overlay-messages no-scrollbar">
+                                {[...messages].reverse().map((message, index) => (
+                                    <p
+                                        key={index}
+                                        className={cn(
+                                            'captions-overlay-message',
+                                            message.role === 'user' ? 'text-orange-300' : 'text-white'
+                                        )}
+                                    >
+                                        <span className="font-bold">
+                                            {message.role === 'user' ? userName : name.split(' ')[0].replace(/[.,]/g, '')}:
+                                        </span>{' '}
+                                        {message.content}
+                                    </p>
+                                ))}
+                                <div ref={captionsEndRef} />
+                            </div>
+                        </div>
+                    )}
                 </div>
 
                 <div className="user-section">
@@ -133,6 +194,19 @@ const CompanionComponent = ({ companionId, subject, topic, name, userName, userI
                             {isMuted ? 'Turn on microphone' : 'Turn off microphone'}
                         </p>
                     </button>
+                    <button
+                        className={cn(
+                            'btn-captions',
+                            isCaptionsOn && 'btn-captions-active'
+                        )}
+                        onClick={toggleCaptions}
+                        disabled={callStatus !== CallStatus.ACTIVE}
+                    >
+                        <Image src="/icons/captions.svg" alt="captions" width={36} height={36} className={isCaptionsOn ? '' : 'opacity-50'} />
+                        <p className="max-sm:hidden">
+                            {isCaptionsOn ? 'Turn off captions' : 'Turn on captions'}
+                        </p>
+                    </button>
                     <button className={cn('rounded-lg py-2 cursor-pointer transition-colors w-full text-white', callStatus ===CallStatus.ACTIVE ? 'bg-red-700' : 'bg-primary', callStatus === CallStatus.CONNECTING && 'animate-pulse')} onClick={callStatus === CallStatus.ACTIVE ? handleDisconnect : handleCall}>
                         {callStatus === CallStatus.ACTIVE
                         ? "End Session"
@@ -143,6 +217,25 @@ const CompanionComponent = ({ companionId, subject, topic, name, userName, userI
                     </button>
                 </div>
             </section>
+
+            {/* Text Input Section */}
+            <form className="text-input-form" onSubmit={handleSendText}>
+                <input
+                    type="text"
+                    className="text-input"
+                    placeholder={callStatus === CallStatus.ACTIVE ? "Type a message to your companion..." : "Start a session to send messages..."}
+                    value={textMessage}
+                    onChange={(e) => setTextMessage(e.target.value)}
+                    disabled={callStatus !== CallStatus.ACTIVE}
+                />
+                <button
+                    type="submit"
+                    className="btn-send"
+                    disabled={callStatus !== CallStatus.ACTIVE || !textMessage.trim()}
+                >
+                    <Image src="/icons/send.svg" alt="send" width={24} height={24} />
+                </button>
+            </form>
 
             <section className="transcript">
                 <div className="transcript-message no-scrollbar">

@@ -183,7 +183,7 @@ body {
   }
 
   .companion-section {
-    @apply border-2 border-orange-500 w-2/3 max-sm:w-full flex flex-col gap-4 justify-center items-center rounded-lg;
+    @apply relative border-2 border-orange-500 w-2/3 max-sm:w-full flex flex-col gap-4 justify-center items-center rounded-lg;
   }
 
   .companion-avatar {
@@ -212,6 +212,51 @@ body {
   }
   .transcript-fade {
     @apply pointer-events-none absolute bottom-0 left-0 right-0 h-40 max-sm:h-20 bg-gradient-to-t from-background via-background/90 to-transparent z-10;
+  }
+
+  /* Deaf accessibility: Text Input */
+  .text-input-form {
+    @apply flex gap-2 w-full mt-4 items-center;
+  }
+  .text-input {
+    @apply flex-1 border-2 border-black rounded-lg px-4 py-3 text-lg outline-none transition-all duration-200 bg-white text-black;
+  }
+  .text-input:focus {
+    @apply border-primary;
+  }
+  .text-input:disabled {
+    @apply opacity-50 cursor-not-allowed bg-gray-100;
+  }
+  .btn-send {
+    @apply border-2 border-black rounded-lg p-3 cursor-pointer transition-all duration-200 bg-primary hover:bg-primary/80;
+  }
+  .btn-send:disabled {
+    @apply opacity-30 cursor-not-allowed hover:bg-primary;
+  }
+
+  /* Deaf accessibility: Captions Toggle */
+  .btn-captions {
+    @apply border-2 border-black rounded-lg flex flex-col gap-2 items-center py-8 max-sm:py-2 cursor-pointer w-full transition-all duration-200;
+  }
+  .btn-captions:disabled {
+    @apply opacity-50 cursor-not-allowed;
+  }
+  .btn-captions-active {
+    @apply border-primary bg-primary/10;
+  }
+
+  /* Deaf accessibility: Live Captions Overlay */
+  .captions-overlay {
+    @apply absolute bottom-0 left-0 right-0 bg-black/85 backdrop-blur-sm rounded-b-lg z-20 flex flex-col max-h-[40%] overflow-hidden;
+  }
+  .captions-overlay-header {
+    @apply flex items-center gap-2 px-4 py-2 text-white/70 text-sm font-semibold border-b border-white/10;
+  }
+  .captions-overlay-messages {
+    @apply flex flex-col gap-2 px-4 py-3 overflow-y-auto;
+  }
+  .captions-overlay-message {
+    @apply text-base leading-relaxed;
   }
 }
 
